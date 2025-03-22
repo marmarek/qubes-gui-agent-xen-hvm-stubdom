@@ -119,7 +119,7 @@ static void send_pixmap_grant_refs(QubesGuiState * qs)
     struct msg_window_dump_hdr wd_hdr;
 
     if (surface_xen_refs(qs->surface) == NULL) {
-        fprintf(stderr, "Can't dump surface without grant refs allocation!\n");
+        fprintf(stderr, "Can't dump surface without grant refs allocation (surface %p!\n", qs->surface);
         return;
     }
 
@@ -654,8 +654,10 @@ uint8_t *qubesgui_alloc_surface_data(int width, int height, uint32_t **refs) {
     pages = ((width * height * 4) + XC_PAGE_SIZE - 1) >> XC_PAGE_SHIFT;
 
     *refs = calloc(pages, sizeof(uint32_t));
-    if (*refs == NULL)
+    if (*refs == NULL) {
+        fprintf(stderr, "Failed to allocate refs (%#lx)!\n", pages*4);
         return NULL;
+    }
 
     if (xgs == NULL) {
         xgs = xengntshr_open(NULL, 0);
